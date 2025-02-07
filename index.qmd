@@ -1,0 +1,102 @@
+---
+title: "Alayna Smith's Portfolio"
+format: html
+embed-resources: true
+---
+
+# 
+
+### [Exercise 1:]{.underline}
+
+![](ConnectionMap.png){width="400"}
+
+source: <https://r-graph-gallery.com/how-to-draw-connecting-routes-on-map-with-r-and-great-circles.html>
+
+**Marks**: Dots, connection lines, and city names (labels).
+
+**Properties**:
+
+-   Position (X,Y) on the map - mapped to each city.
+
+-   Color - each label is purple and each line is blue.
+
+-   Connection lines - mapped to the relationships between the cities.
+
+**Main Story** **Of This Graphic**: This visualization displays connections between big cities worldwide. It shows how certain locations act as hubs connecting various regions.
+
+**What Makes it a Good Graphic**:
+
+-   Easy/clear to understand the relationships
+
+-   Accurate representation of the world
+
+-   Colors: contrasts nicely, and minimalistic
+
+**Features I think I would be able to implement:**
+
+-   Importing the `map` package to use the `maps()` function
+
+-   Using the `points()` function to add dots to the map
+
+-   Importing the `geosphere` package using the `lines()` function to display the lines between cities
+
+**Features I would not know how to do:**
+
+-   Finding out the longitude and latitude of the cities and creating a dataframe to store those
+-   Using the `gcIntermediate()` function to make connections between cities
+
+### [Exercise 2:]{.underline}
+
+Exercise 1:
+
+```{r}
+library(tidyverse)
+seattle_weather <- read_csv("weather-with-dates.csv")
+weather_2023 <- seattle_weather %>%
+  filter(lubridate::year(date) == 2014 & month(date) == 3)
+```
+
+```{r}
+ggplot(seattle_weather, aes(x = date, y = temp_max)) +
+  geom_line(color = "lightblue") + 
+  geom_point(color = "blue", alpha = 0.3) + 
+  labs(title = "Seattle Daily High Temperatures",
+       x = "Date",
+       y = "Max Temperature (°C)")
+```
+
+```{r}
+# Create a day-of-year column for overlaying same days across years
+seattle_weather$day_of_year <- format(seattle_weather$date, "%m-%d")
+
+# Define the breaks (first day of each month)
+month_breaks <- c("01-01", "02-01", "03-01", "04-01", "05-01", "06-01",
+                  "07-01", "08-01", "09-01", "10-01", "11-01", "12-01")
+
+ggplot(seattle_weather, aes(x = day_of_year, y = temp_max, group = year, color = as.factor(year))) +
+  geom_line(alpha = 0.7) +
+  labs(title = "Seattle Daily High Temperatures From 2012 To 2016",
+       x = "Day of Year",
+       y = "Max Temperature (°C)",
+       color = "Year") +
+    scale_x_discrete(breaks = month_breaks) 
+```
+
+Exercise 2:
+
+```{r}
+# Extract year and month
+seattle_weather$month <- format(seattle_weather$date, "%m")
+
+# Compute mean temperature (average of temp_max and temp_min) for each month and year
+seattle_weather$mean_temp <- (seattle_weather$temp_max + seattle_weather$temp_min) / 2
+monthly_avg <- aggregate(mean_temp ~ year + month, seattle_weather, mean)
+
+ggplot(monthly_avg, aes(x = month, y = mean_temp, group = year, color = as.factor(year))) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(title = "Seattle Average Monthly Temperature",
+       x = "Month",
+       y = "Mean Temperature (°C)",
+       color = "Year") 
+```
