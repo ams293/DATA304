@@ -1,7 +1,8 @@
 --- 
-title: main page
+title: Portfolio Main Page - Alayna Smith
 format: html
 embed-resources: true
 ---
 
 [HW5](HW5/)
+[HW6](HW6/)

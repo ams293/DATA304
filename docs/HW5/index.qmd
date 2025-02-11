@@ -2,6 +2,7 @@
 title: "Alayna Smith's Portfolio"
 format: html
 embed-resources: true
+code-tools: true
 ---
 
 # 
@@ -50,6 +51,8 @@ source: <https://r-graph-gallery.com/how-to-draw-connecting-routes-on-map-with-r
 Exercise 1:
 
 ```{r}
+#| message: false
+#| warning: false
 library(tidyverse)
 seattle_weather <- read_csv("weather-with-dates.csv")
 weather_2023 <- seattle_weather %>%
