@@ -1,5 +1,7 @@
 ---
 title: "HW6"
+subtitle: "due 2/11"
+author: "Alayna Smith - ams293"
 format: html
 embed-resources: true
 code-tools: true
