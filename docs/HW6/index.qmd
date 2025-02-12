@@ -1,0 +1,60 @@
+---
+title: "HW6"
+format: html
+embed-resources: true
+code-tools: true
+---
+
+[**Exercise 1:**]{.underline}
+
+**a)** The most interesting lesson, guide, or advice Tufte offers me in this chapter would be the concept of **layered information design**. I find it intriguing how a chart can show and tell many different stories on different levels of detail. There is the Overview Level, which shows big-picture trends, the Mid Level, which identifies patterns and anomalies, and the Detailed Level, which visualizes precise data points.
+
+**b)**
+
+![](NYCweather.png){width="500"}
+
+-   This graphic is on page 30.
+
+-   I chose this graphic because it has multiple layers and stories. For 12 months, it visualizes the 1980 temperatures, the normal temperatures, the highest temperature in 1980, the lowest temperature in 1980, the precipitation in 1980, the normal precipitation, and the relative humidity.
+
+-   Encoding channels:
+
+    -   Position (X-axis): Time (month)
+
+    -   Position (Y-axis): Temperature, Precipitation, or Humidity
+
+    -   Line and Area (Black Shaded Region): Daily Temperature Variation
+
+    -   Bars (Bar Chart) → Precipitation
+
+    -   Line Graph (Bottom Graph): Relative Humidity
+
+    -   Color (Black vs. White Stripes): Actual vs. Normal values
+
+-   Given what I know so far, I would have a very difficult time replicating this graphic. There are multiple charts being displayed, and many legends and labels. I would not know how to put the precipitation and humidity charts underneath the temperature graph. I also would not know how to put the labels on the temperature chart for the highest and lowest temperatures.
+
+-   Tufte's point: This graphic is an example of high-density data visualization done well, where multiple variables are used. This enhances, rather than overwhelms, the reader.
+
+[**Exercise 2:**]{.underline}
+
+1.  Changing the type of a graph can significantly improve the clarity of a chart.
+
+2.  Use the title space to answer the question "so what?"
+
+[**Exercise 3:**]{.underline}
+
+1.  The chart has two Y-axis, which makes readers confused. Solution: Put Completion Rate on one axis and Response Rate on the other axis.
+
+2.  Percentage labels make the chart look cluttered. Solution: Don't include individual percentages or use tooltip.
+
+3.  The chart uses both bars and lines - they don't match. Solution: Use either bars, lines, or points.
+
+Vega Editor code:
+
+{ "title": "Response and Completion Rates", "data": { "values" : \[{"Date":"Q1-2017","Completion Rate":0.91,"Response Rate":0.023}, {"Date":"Q2-2017","Completion Rate":0.93,"Response Rate":0.018}, {"Date":"Q3-2017","Completion Rate":0.91,"Response Rate":0.028}, {"Date":"Q4-2017","Completion Rate":0.89,"Response Rate":0.023}, {"Date":"Q1-2018","Completion Rate":0.84,"Response Rate":0.034}, {"Date":"Q2-2018","Completion Rate":0.88,"Response Rate":0.027}, {"Date":"Q3-2018","Completion Rate":0.91,"Response Rate":0.026}, {"Date":"Q4-2018","Completion Rate":0.87,"Response Rate":0.039}, {"Date":"Q1-2019","Completion Rate":0.83,"Response Rate":0.028}\] }, "height": 400, "width": 450, "mark": { "type": "point", "filled": true }, "encoding": { "x": { "field": "Completion Rate", "type": "quantitative", "scale": { "domain": \[0.8, 0.95\] } }, "y": { "field": "Response Rate", "type": "quantitative", "scale": { "domain": \[0.015, 0.04\] } }, "color": { "field": "Date", "type": "nominal" }, "size": { "value": 300 } } }
+
+Graph:
+
+![](ResponseCompletionRates.png){width="400"}
+
+How my graph was influenced by what I learned in the assignment: In exercise 2, I learned that changing the type of a graph can significantly improve the clarity of a chart. When making my graph, I switched between bars and lines, and eventually tried a scatter plot and realized that it was much easier to read. Due to the completion and response rates being very far apart, using lines and bars made the graph difficult to read. By using a scatter plot, I was able to put the completion rates on one axis and response rates on the other, which made it easier to scale.
