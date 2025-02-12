@@ -96,8 +96,8 @@ seattle_weather$mean_temp <- (seattle_weather$temp_max + seattle_weather$temp_mi
 monthly_avg <- aggregate(mean_temp ~ year + month, seattle_weather, mean)
 
 ggplot(monthly_avg, aes(x = month, y = mean_temp, group = year, color = as.factor(year))) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
+  geom_line() +
+  geom_point(size=2) +
   labs(title = "Seattle Average Monthly Temperature",
        x = "Month",
        y = "Mean Temperature (°C)",
