@@ -51,12 +51,53 @@ code-tools: true
 
 3.  The chart uses both bars and lines - they don't match. Solution: Use either bars, lines, or points.
 
-Vega Editor code:
-
-{ "title": "Response and Completion Rates", "data": { "values" : \[{"Date":"Q1-2017","Completion Rate":0.91,"Response Rate":0.023}, {"Date":"Q2-2017","Completion Rate":0.93,"Response Rate":0.018}, {"Date":"Q3-2017","Completion Rate":0.91,"Response Rate":0.028}, {"Date":"Q4-2017","Completion Rate":0.89,"Response Rate":0.023}, {"Date":"Q1-2018","Completion Rate":0.84,"Response Rate":0.034}, {"Date":"Q2-2018","Completion Rate":0.88,"Response Rate":0.027}, {"Date":"Q3-2018","Completion Rate":0.91,"Response Rate":0.026}, {"Date":"Q4-2018","Completion Rate":0.87,"Response Rate":0.039}, {"Date":"Q1-2019","Completion Rate":0.83,"Response Rate":0.028}\] }, "height": 400, "width": 450, "mark": { "type": "point", "filled": true }, "encoding": { "x": { "field": "Completion Rate", "type": "quantitative", "scale": { "domain": \[0.8, 0.95\] } }, "y": { "field": "Response Rate", "type": "quantitative", "scale": { "domain": \[0.015, 0.04\] } }, "color": { "field": "Date", "type": "nominal" }, "size": { "value": 300 } } }
-
-Graph:
-
-![](ResponseCompletionRates.png){width="400"}
+```{r}
+library(vegawidget)
+'
+{
+  "title": "Response and Completion Rates",
+  "data":
+    { "values" :
+        [{"Date":"Q1-2017","Completion Rate":0.91,"Response Rate":0.023},
+        {"Date":"Q2-2017","Completion Rate":0.93,"Response Rate":0.018},
+        {"Date":"Q3-2017","Completion Rate":0.91,"Response Rate":0.028},
+        {"Date":"Q4-2017","Completion Rate":0.89,"Response Rate":0.023},
+        {"Date":"Q1-2018","Completion Rate":0.84,"Response Rate":0.034},
+        {"Date":"Q2-2018","Completion Rate":0.88,"Response Rate":0.027},
+        {"Date":"Q3-2018","Completion Rate":0.91,"Response Rate":0.026},
+        {"Date":"Q4-2018","Completion Rate":0.87,"Response Rate":0.039},
+        {"Date":"Q1-2019","Completion Rate":0.83,"Response Rate":0.028}] 
+    },
+  "height": 400,
+  "width": 450,
+  "mark": {
+    "type": "point",
+    "filled": true
+  },
+  "encoding": {
+    "x": {
+      "field": "Completion Rate", 
+      "type": "quantitative",
+      "scale": {
+        "domain": [0.8, 0.95]
+      }
+      },
+    "y": {
+      "field": "Response Rate", 
+      "type": "quantitative",
+      "scale": {
+        "domain": [0.015, 0.04]
+      }
+      },
+    "color": {
+      "field": "Date", 
+      "type": "nominal"
+      },
+    "size": {
+      "value": 300
+    }
+  }
+}' |> as_vegaspec()
+```
 
 How my graph was influenced by what I learned in the assignment: In exercise 2, I learned that changing the type of a graph can significantly improve the clarity of a chart. When making my graph, I switched between bars and lines, and eventually tried a scatter plot and realized that it was much easier to read. Due to the completion and response rates being very far apart, using lines and bars made the graph difficult to read. By using a scatter plot, I was able to put the completion rates on one axis and response rates on the other, which made it easier to scale.
