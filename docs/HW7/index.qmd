@@ -1,0 +1,318 @@
+---
+title: "HW6"
+subtitle: "due 2/16"
+author: "Alayna Smith - ams293"
+format: html
+embed-resources: true
+code-tools: true
+---
+
+[**Exercise 1:**]{.underline}
+
+a\) Guidelines: The author emphasizes that the bars in the bar plot should be sorted in the most meaningful and readable way. For example, bars could be sorted by descending values, alphabetically, time, age, etc. The author also talks about whitespace and how the bars should be evenly close enough to reduce the space between them as much as possible. The author also mentions using meaningful colors and baseline.
+
+b\) Not advised to use a bar chart: The author states that bar charts work best for categorical data. One limitation of bar charts is that they have to have a zero baseline, which might be impractical for some datasets. For continuous data, other charts such as dot plots may work better.
+
+c\) Alternatives to bar charts: The author mentions dot plots and heatmaps**.**
+
+d\) Stacked bars: useful when you have only a few categories and want to show how different categories contribute to a total.
+
+Dodged bars: useful to compare the values within each category. Shows clearer comparisons when multiple categories are involved.
+
+e\)
+
+```{r, warning=FALSE}
+library(vegawidget)
+'
+{
+  "title": "Highest grossing movies for the weekend of December 22-24, 2017",
+  "data":
+    { "url" : "https://calvin-data304.netlify.app/data/cow-movies.csv" 
+    },
+  "height": 400,
+  "width": 450,
+  "mark": {
+    "type": "bar"
+  },
+  "encoding": {
+    "x": {
+      "field": "amount", 
+      "type": "quantitative",
+      "title": "weekend gross (million USD)"
+      },
+    "y": {
+      "field": "title", 
+      "type": "ordinal",
+      "sort": "-x", 
+      "title": null
+      }
+  }
+}
+' |> as_vegaspec()
+```
+
+f\)
+
+Figure 6.8:
+
+```{r, warning=FALSE}
+'
+{
+  "title": "2016 median U.S. annual household income",
+  "data":
+    { "url" : "https://calvin-data304.netlify.app/data/cow-income.csv" 
+    },
+  "transform": [
+  {
+    "filter": {
+      "field": "race",
+      "oneOf": ["white", "asian", "hispanic", "black"]
+    }
+  }
+  ],
+  "height": 400,
+  "width": 450,
+  "mark": {
+    "type": "bar"
+  },
+  "encoding": {
+    "x": {
+      "field": "race", 
+      "type": "nominal",
+      "title": null,
+      "sort": ["asian", "white", "hispanic", "black"]
+      },
+    "y": {
+      "field": "median_income", 
+      "type": "quantitative",
+      "title": "median income (USD)"
+      },
+    "color": {
+      "field": "age",
+      "type": "nominal",
+      "scale": {
+        "scheme": "blues"
+      },
+      "legend": {
+        "title": "age (yrs)"
+      }
+    },
+    "xOffset": {
+      "field": "age",
+      "type": "nominal"
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+Figure 6.9:
+
+```{r, warning=FALSE}
+'
+{
+  "title": "2016 median U.S. annual household income",
+  "data":
+    { "url" : "https://calvin-data304.netlify.app/data/cow-income.csv" 
+    },
+  "transform": [
+  {
+    "filter": {
+      "field": "race",
+      "oneOf": ["white", "asian", "hispanic", "black"]
+    }
+  }
+  ],
+  "facet": {
+    "field": "race",
+    "type": "nominal",
+    "columns": 2
+  },
+  "spec":{
+    "mark": "bar",
+    "encoding": {
+      "x": {
+        "field": "age", 
+        "type": "nominal",
+        "title": "age (years)",
+        "sort": ["asian", "white", "hispanic", "black"]
+      },
+      "y": {
+        "field": "median_income", 
+        "type": "quantitative",
+        "title": "median income (USD)"
+      }
+    }
+  }
+}
+
+' |> as_vegaspec()
+```
+
+g\)
+
+```{r, warning=FALSE}
+'
+{
+  "title": "2016 median U.S. annual household income",
+  "data":
+    { "url" : "https://calvin-data304.netlify.app/data/cow-gapminder.csv" 
+    },
+  "transform": [
+    {
+      "filter": "datum.year == 2007 && datum.continent == \'Americas\'"
+    }
+  ],
+  "mark": "point",
+  "width": 450,
+  "height": 400,
+  "encoding": {
+    "x": {
+      "field": "lifeExp", 
+      "type": "quantitative",
+      "scale": {
+        "domain": [60, 81]
+      },
+      "title": "life expectancy (years)"
+    },
+    "y": {
+      "field": "country", 
+      "type": "nominal",
+      "sort": {"field": "lifeExp", "order": "descending"},
+      "title": null
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+Figure 6.12 is "bad" because it is a bar graph, and a bar graph requires a zero baseline, which means the bars are unnecessarily long. This makes the plot difficult to read.
+
+Figure 6.13 is "bad" because the countries are not sorted by life expectancy, which makes the points difficult to compare to each other.
+
+[**Exercise 2:**]{.underline}
+
+b\)
+
+1.  use clear colors and shapes to avoid incorrect perceptions. (for example: 3D, illusions, etc.)
+
+2.  don't use stacked bars when readers are expected to compare the sizes of the bars without a common baseline.
+
+3.  use scales wisely to reduce unnecessary whitespace.
+
+c\)
+
+1.  Napoleon's army
+
+2.  
+
+[**Exercise 3:**]{.underline}
+
+a\) Mapping two variables to the x and y axes and using color to represent the magnitude of a third variable.
+
+b\)
+
+```{r, warning=FALSE}
+'
+{
+  "title": "Internet adoption over time",
+  "data":
+    { "url" : "https://calvin-data304.netlify.app/data/cow-internet2.csv" 
+    },
+  "height": 400,
+  "width": 400,
+  "mark": "rect",
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "ordinal",
+      "title": null
+    },
+    "y": {
+      "field": "country",
+      "type": "nominal",
+      "sort": {
+        "field": "users",
+        "op": "max",
+        "order": "descending"
+      },
+      "title": null
+    },
+    "color": {
+      "field": "users",
+      "type": "quantitative",
+      "scale": {
+        "scheme": "inferno"
+      },
+      "title": "Internet users / 100 people"
+    }
+  },
+  "config": {
+    "axis": {
+      "grid": true
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+c\) At 20:10, Healy explains how data analysts are prone to trying to find trends by looking at a plot, even if there isn't a very obvious one. This can cause unnecessary or untrue assumptions to be made. Around 27 minutes in the video, Healy shows a heat map and explains how the color scheme makes it difficult to compare different data points in the chart. He implies that heat maps are not the best chart to make when readers are expected to find similarities and differences in the data.
+
+d\) In the mortality heat map, the reader is expected to find overall trends and patterns, so the heat map is very useful for that. The issue of not being able to compare specific points is not an issue here because the story that the graphic is making is different. This is also not an issue for the internet usage data because, similarly to the mortality data, the point of the graphic is to find overall trends and patterns, not specific data points.
+
+[**Exercise 4:**]{.underline}
+
+a\) Healy states that pie charts are much more difficult to read because it is less obvious what the relative values of the area are. Our brains find it easier to compare lengths then angles.
+
+b\) Wilke says that pie charts can be just as useful as stacked bars and side-by-side bars. He states that none of these visualizations is consistently superior over any other. Depending on the features of the dataset and the specific story you want to tell, you may want to favor one or the other approach.
+
+c\) In general, pie charts work well when the goal is to emphasize simple fractions, such as one-half, one-third, or one-quarter. They also work well when we have very small datasets. A single pie chart looks just fine, but a single column of **stacked bars** looks awkward. Stacked bars, on the other hand, can work for side-by-side comparisons of multiple conditions or in a time series, and **side-by-side bars** are preferred when we want to directly compare the individual fractions to each other.
+
+d\)
+
+```{r, warning=FALSE}
+'
+{
+  "title": "Party composition of the 8th German Bundestag",
+  "data":
+    { "values" :
+        [{"Party":"CDU/CSU","Seats":243},
+        {"Party":"SPD","Seats":214},
+        {"Party":"FDP","Seats":39}]
+    },
+  "height": 400,
+  "width": 450,
+  "mark": "arc",
+  "encoding": {
+    "theta": {
+      "field": "Seats", 
+      "type": "quantitative",
+      "stack": true
+      },
+    "color": {
+      "field": "Party", 
+      "type": "nominal",
+      "legend": null
+      }
+  },
+  "layer": [{
+    "mark": {
+      "type": "arc", 
+      "outerRadius": 150
+    }
+  }, 
+  {
+    "mark": {
+      "type": "text", 
+      "radius": 180
+    },
+    "encoding": {
+      "text": {
+        "field": "Party", 
+        "type": "nominal"
+      }
+    }
+  }]
+}
+' |> as_vegaspec()
+```
