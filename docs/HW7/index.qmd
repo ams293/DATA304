@@ -1,5 +1,5 @@
 ---
-title: "HW6"
+title: "HW7"
 subtitle: "due 2/16"
 author: "Alayna Smith - ams293"
 format: html
