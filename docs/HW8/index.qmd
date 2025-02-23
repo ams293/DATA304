@@ -1,0 +1,504 @@
+---
+title: "HW8"
+subtitle: "due 2/23"
+author: "Alayna Smith - ams293"
+format: html
+embed-resources: true
+code-tools: true
+---
+
+[**Exercise 1:**]{.underline}
+
+Basic bars:
+
+```{r, warning=FALSE}
+library(vegawidget)
+'
+{
+  "title": "Capacity and Demand Hours by Month",
+  "data":
+    { "url" :
+        "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+    },
+  "height": 400,
+  "width": 450,
+  "transform": [
+    {
+      "fold": ["capacity", "demand"],
+      "as": ["Type", "Value"]
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"Value\\"], \\",\\", \\"\\"))",
+      "as": "Numeric_Value"
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x":{
+      "field": "date", 
+      "type": "nominal",
+      "title": "Date"
+    },
+    "y":{
+      "field": "Numeric_Value",
+      "type": "quantitative",
+      "title": "Number of Project Hours"
+    },
+    "xOffset": {
+      "field": "Type"
+    },
+    "color": {
+      "field": "Type", 
+      "type": "nominal",
+      "title": null
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+Line Graph:
+
+```{r, warning=FALSE}
+'
+{
+  "title": "Capacity and Demand Hours by Month",
+  "data":
+    { "url" :
+        "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+    },
+  "height": 400,
+  "width": 450,
+  "transform": [
+    {
+      "fold": ["capacity", "demand"],
+      "as": ["Type", "Value"]
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"Value\\"], \\",\\", \\"\\"))",
+      "as": "Numeric_Value"
+    }
+  ],
+  "mark": "line",
+  "encoding": {
+    "x":{
+      "field": "date", 
+      "type": "nominal",
+      "title": "Date"
+    },
+    "y":{
+      "field": "Numeric_Value",
+      "type": "quantitative",
+      "title": "Number of Project Hours"
+    },
+    "xOffset": {
+      "field": "Type"
+    },
+    "color": {
+      "field": "Type", 
+      "type": "nominal",
+      "title": null
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+Overlapping Bars:
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Capacity and Demand Hours by Month",
+    "subtitle": "Capacity: dark blue, Demand: light blue"
+  },
+  "subtitle": "Capacity: dark blue",
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+  },
+  "height": 400,
+  "width": 450,
+    "transform": [
+    {
+      "calculate": "toNumber(replace(datum[\\"capacity\\"], \\",\\", \\"\\"))",
+      "as": "capacity_Value"
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"demand\\"], \\",\\", \\"\\"))",
+      "as": "demand_Value"
+    }
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "bar",
+        "opacity": 0.5
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "nominal"
+        },
+        "y": {
+          "field": "capacity_Value",
+          "type": "quantitative"
+        },
+        "color": {
+          "value": "blue"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "bar",
+        "opacity": 0.5
+      },
+      "encoding": {
+        "x": {
+          "field": "date",
+          "type": "nominal"
+        },
+        "y": {
+          "field": "demand_Value",
+          "type": "quantitative",
+          "title": "Number of Project Hours"
+        },
+        "color": {
+          "value": "steelblue"
+        }
+      }
+    }
+  ]
+}
+' |> as_vegaspec()
+```
+
+Stacked bars:
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Capacity and Unmet Demand by Month"
+  },
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+  },
+  "height": 400,
+  "width": 450,
+  "transform": [
+    {
+      "calculate": "toNumber(replace(datum[\\"capacity\\"], \\",\\", \\"\\"))",
+      "as": "capacity_Value"
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"demand\\"], \\",\\", \\"\\"))",
+      "as": "demand_Value"
+    },
+    {
+      "calculate": "datum.demand_Value - datum.capacity_Value",
+      "as": "unmet_demand"
+    },
+    {
+      "fold": ["capacity_Value", "unmet_demand"],
+      "as": ["category", "value"]
+    }
+  ],
+  "mark": "bar",
+  "encoding": {
+    "x": {
+      "field": "date",
+      "type": "nominal",
+      "axis": {"title": "Date"}
+    },
+    "y": {
+      "field": "value",
+      "type": "quantitative",
+      "axis": {"title": "Number of Project Hours"},
+      "stack": "zero"
+    },
+    "color": {
+      "field": "category",
+      "type": "nominal",
+      "scale": {
+        "domain": ["capacity_Value", "unmet_demand"],
+        "range": ["steelblue", "orange"]
+      },
+      "legend": {"title": null}
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+Dot Plot:
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Capacity and Demand Hours by Month",
+    "subtitle": "Capacity: dark blue, Demand: light blue"
+  },
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+  },
+    "transform": [
+    {
+      "calculate": "toNumber(replace(datum[\\"capacity\\"], \\",\\", \\"\\"))",
+      "as": "capacity_Value"
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"demand\\"], \\",\\", \\"\\"))",
+      "as": "demand_Value"
+    },
+    {
+      "calculate": "datum.demand_Value / 1000",
+      "as": "demand_thousand"
+    },
+    {
+      "calculate": "datum.capacity_Value / 1000",
+      "as": "capacity_thousand"
+    }
+  ],
+  "height": 400,
+  "width": 450,
+  "layer": [
+    {
+      "mark": "bar",
+      "encoding": {
+        "x": {
+          "field": "date", 
+          "type": "nominal"
+          },
+        "y": {
+          "field": "capacity_thousand", 
+          "type": "quantitative"
+          },
+        "y2": {
+          "field": "demand_thousand"
+          },
+        "color": {
+          "value": "lightblue"
+        },
+        "size": {"value": 10}
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 200},
+      "encoding": {
+        "x": {
+          "field": "date", 
+          "type": "nominal"
+          },
+        "y": {
+          "field": "capacity_thousand", 
+          "type": "quantitative",
+          "axis": {"title": "Project Hours (Thousands)"}
+          },
+        "color": {
+          "value": "blue",
+          "legend": {"title": "Legend", "orient": "right"}
+        }
+      }
+    },
+    {
+      "mark": {"type": "point", "filled": true, "size": 200},
+      "encoding": {
+        "x": {
+          "field": "date", 
+          "type": "nominal"
+          },
+        "y": {
+          "field": "demand_thousand", 
+          "type": "quantitative"
+          },
+        "color": {
+          "value": "steelblue"
+        }
+      }
+    },
+    {
+      "mark": {
+        "type": "text", 
+        "dy": -15
+        },
+      "encoding": {
+        "x": {
+          "field": "date", 
+          "type": "nominal"
+          },
+        "y": {
+          "field": "capacity_thousand", 
+          "type": "quantitative"
+          },
+        "text": {
+          "field": "capacity_thousand", 
+          "type": "quantitative",
+          "format": ".0f"
+          },
+        "color": {"value": "blue"}
+      }
+    },
+    {
+      "mark": {
+        "type": "text", 
+        "dy": -15
+      },
+      "encoding": {
+        "x": {
+          "field": "date", 
+          "type": "nominal"
+          },
+        "y": {
+          "field": "demand_thousand", 
+          "type": "quantitative"
+          },
+        "text": {
+          "field": "demand_thousand", 
+          "type": "quantitative",
+          "format": ".0f"
+          },
+        "color": {"value": "steelblue"}
+      }
+    }
+  ]
+}
+' |> as_vegaspec()
+```
+
+Unmet Demand Line Graph:
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Unmet Demand by Month"
+  },
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/swd-lets-practice-ex-2-3.csv"
+  },
+  "height": 400,
+  "width": 450,
+  "transform": [
+    {
+      "calculate": "toNumber(replace(datum[\\"capacity\\"], \\",\\", \\"\\"))",
+      "as": "capacity_Value"
+    },
+    {
+      "calculate": "toNumber(replace(datum[\\"demand\\"], \\",\\", \\"\\"))",
+      "as": "demand_Value"
+    },
+    {
+      "calculate": "datum.demand_Value - datum.capacity_Value",
+      "as": "unmet_demand"
+    }
+  ],
+  "mark": "line",
+  "encoding": {
+    "x": {
+      "field": "date",
+      "type": "nominal",
+      "title": "Date"
+    },
+    "y": {
+      "field": "unmet_demand",
+      "type": "quantitative",
+      "title": "Number of Project Hours"
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+[**Exercise 2:**]{.underline}
+
+a\)
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Total Workforce Percentage by Gender Over Time",
+    "subtitle": "Summed percentage of people working in recorded jobs, separated by gender."
+  },
+  "data": {
+    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json",
+    "format": {"type": "json"},
+    "transform": [
+      {
+        "type": "aggregate",
+        "groupby": ["year", "sex"],
+        "ops": ["sum"],
+        "fields": ["perc"],
+        "as": ["total_perc"]
+      }
+    ]
+  },
+  "mark": "line",
+  "encoding": {
+    "x": {
+      "field": "year",
+      "type": "quantitative", 
+      "title": "Year"
+    },
+    "y": {
+      "field": "total_perc",
+      "type": "quantitative",
+      "title": "Total Percentage of Workforce"
+    },
+    "color": {
+      "field": "sex",
+      "type": "nominal",
+      "title": "Gender"
+    }
+  }
+}
+' |> as_vegaspec()
+```
+
+b\)
+
+```{r, warning=FALSE}
+'
+{
+  "title": {
+    "text": "Workforce Composition Over Time",
+    "subtitle": "Percentage of men and women in different jobs (1850 - 2000)"
+  },
+  "data": {
+    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json",
+    "format": {"type": "json"}
+  },
+  "transform": [
+    {
+          "type": "filter",
+          "expr": "isValid(datum[\\"1850\\"]) && isFinite(+datum[\\"1850\\"]) && isValid(datum[\\"1900\\"]) && isFinite(+datum[\\"1900\\"]) && isValid(datum[\\"1950\\"]) && isFinite(+datum[\\"1950\\"]) && isValid(datum[\\"2000\\"]) && isFinite(+datum[\\"2000\\"])"
+    }
+  ],
+  "facet": {
+    "column": {"field": "year", "type": "ordinal", "title": "Year"}
+  },
+  "spec": {
+    "mark": "point",
+    "encoding": {
+      "x": {
+        "field": "job",
+        "type": "nominal"
+      },
+      "y": {
+        "field": "perc",
+        "type": "quantitative",
+        "axis": {"title": "Percentage of Workforce", "format": ".0%"}
+      },
+      "color": {
+        "field": "sex",
+        "type": "nominal",
+        "title": "Gender"
+      }
+    }
+  }
+}
+' |> as_vegaspec()
+```
