@@ -502,3 +502,42 @@ b\)
 }
 ' |> as_vegaspec()
 ```
+
+[**Exercise 3:**]{.underline}
+
+```{r}
+library(tidyverse)
+
+gas_prices <- read.csv("https://calvin-data304.netlify.app/data/pump_price_for_gasoline_us_per_liter.csv")
+country_data <- read.csv("https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv")
+str(gas_prices)
+
+# Reshape the gas prices data from wide to long format
+gas_prices_long <- gas_prices %>%
+  pivot_longer(cols = starts_with("X"), names_to = "Year", values_to = "Price_per_liter") %>%
+  mutate(Price_per_liter = as.numeric(Price_per_liter)) %>% 
+  filter(!is.na(Price_per_liter))  
+
+gas_prices_long <- gas_prices_long %>%
+  mutate(Price_per_gallon = Price_per_liter * 3.78541)
+
+merged_data <- gas_prices_long %>%
+  left_join(country_data, by = c("country" = "name")) %>%
+  select(Price_per_gallon, Alpha_3, Region, Year)
+
+unmatched_countries <- gas_prices_long %>%
+  filter(!country %in% country_data$name)
+
+num_unmatched <- nrow(unmatched_countries)
+
+# Print unmatched countries
+if (num_unmatched > 0) {
+  print(paste("Number of unmatched countries:", num_unmatched))
+  print(unmatched_countries)
+} else {
+  print("All countries matched.")
+}
+
+
+# I know this is very wrong but I was really struggling so I asked chatgpt for help and that obviously didn't work either so I'm just going to ask for help after class. Sorry for being so behind in this class, I have a ton of homework for my other classes and this class somehow got pushed to the bottom of my priorities.
+```
