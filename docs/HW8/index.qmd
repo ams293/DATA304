@@ -2,7 +2,9 @@
 title: "HW8"
 subtitle: "due 2/23"
 author: "Alayna Smith - ams293"
-format: html
+format: 
+  html:
+    code-fold: true
 embed-resources: true
 code-tools: true
 ---
@@ -12,6 +14,8 @@ code-tools: true
 Basic bars:
 
 ```{r, warning=FALSE}
+#| code-fold: true
+
 library(vegawidget)
 '
 {
@@ -416,92 +420,65 @@ Unmet Demand Line Graph:
 
 a\)
 
-```{r, warning=FALSE}
-'
-{
-  "title": {
-    "text": "Total Workforce Percentage by Gender Over Time",
-    "subtitle": "Summed percentage of people working in recorded jobs, separated by gender."
-  },
-  "data": {
-    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json",
-    "format": {"type": "json"},
-    "transform": [
-      {
-        "type": "aggregate",
-        "groupby": ["year", "sex"],
-        "ops": ["sum"],
-        "fields": ["perc"],
-        "as": ["total_perc"]
-      }
-    ]
-  },
-  "mark": "line",
-  "encoding": {
-    "x": {
-      "field": "year",
-      "type": "quantitative", 
-      "title": "Year"
-    },
-    "y": {
-      "field": "total_perc",
-      "type": "quantitative",
-      "title": "Total Percentage of Workforce"
-    },
-    "color": {
-      "field": "sex",
-      "type": "nominal",
-      "title": "Gender"
-    }
-  }
-}
-' |> as_vegaspec()
+```{r}
+library(vegabrite)
+vl_chart() |>
+  vl_aggregate(
+    groupby = list("year", "sex"), 
+    aggregate =  list(list(
+      op ="sum",
+      field = "perc",
+      as = "total_perc"
+    ))
+  ) |>
+  vl_mark_line() |>
+  vl_add_properties(width = 450, height = 400) |>
+  vl_add_properties(
+    title =  list( 
+      text = "Total Percent of Men and Women working various jobs"
+    )) |>
+  vl_encode_x("year:Q") |>
+  vl_encode_y("total_perc:Q") |>
+  vl_encode_color("sex:N") |>
+  vl_add_data(url = "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json") # |> format()
 ```
 
 b\)
 
-```{r, warning=FALSE}
-'
-{
-  "title": {
-    "text": "Workforce Composition Over Time",
-    "subtitle": "Percentage of men and women in different jobs (1850 - 2000)"
-  },
-  "data": {
-    "url": "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json",
-    "format": {"type": "json"}
-  },
-  "transform": [
-    {
-          "type": "filter",
-          "expr": "isValid(datum[\\"1850\\"]) && isFinite(+datum[\\"1850\\"]) && isValid(datum[\\"1900\\"]) && isFinite(+datum[\\"1900\\"]) && isValid(datum[\\"1950\\"]) && isFinite(+datum[\\"1950\\"]) && isValid(datum[\\"2000\\"]) && isFinite(+datum[\\"2000\\"])"
-    }
-  ],
-  "facet": {
-    "column": {"field": "year", "type": "ordinal", "title": "Year"}
-  },
-  "spec": {
-    "mark": "point",
-    "encoding": {
-      "x": {
-        "field": "job",
-        "type": "nominal"
-      },
-      "y": {
-        "field": "perc",
-        "type": "quantitative",
-        "axis": {"title": "Percentage of Workforce", "format": ".0%"}
-      },
-      "color": {
-        "field": "sex",
-        "type": "nominal",
-        "title": "Gender"
-      }
-    }
-  }
-}
-' |> as_vegaspec()
+```{r}
+vl_chart() |>
+  vl_filter(
+    "datum.year == 1850 |
+    datum.year == 1900 |
+    datum.year == 1950 |
+    datum.year == 2000"
+    ) |>
+  vl_facet(
+    field = "year"
+  ) |>
+  vl_pivot(
+    pivot = "sex",
+    value = "perc",
+    groupby = list(
+      "year",
+      "job"
+    )
+  ) |>
+  vl_mark_point() |>
+  vl_add_properties(
+  title =  list( 
+    text = "Percent of Men and Women working various jobs"
+  )) |>
+  vl_encode_x("men:Q") |>
+  vl_axis_x(format=".0%") |>
+  vl_scale_x(type = "symlog", constant = 0.00001) |>
+  vl_encode_y("women:Q") |>
+  vl_axis_y(format=".0%") |>
+  vl_scale_y(type = "symlog", constant = 0.00001) |>
+  vl_encode_color("job:N") |>
+  vl_add_data(url = "https://cdn.jsdelivr.net/npm/vega-datasets@2.8.0/data/jobs.json") 
 ```
+
 
 [**Exercise 3:**]{.underline}
 
@@ -510,22 +487,22 @@ library(tidyverse)
 
 gas_prices <- read.csv("https://calvin-data304.netlify.app/data/pump_price_for_gasoline_us_per_liter.csv")
 country_data <- read.csv("https://raw.githubusercontent.com/lukes/ISO-3166-Countries-with-Regional-Codes/master/all/all.csv")
-str(gas_prices)
 
 # Reshape the gas prices data from wide to long format
-gas_prices_long <- gas_prices %>%
-  pivot_longer(cols = starts_with("X"), names_to = "Year", values_to = "Price_per_liter") %>%
-  mutate(Price_per_liter = as.numeric(Price_per_liter)) %>% 
+gas_prices_long <- gas_prices |>
+  mutate(X2016 = readr::parse_number(X2016)) |>
+  pivot_longer(cols = starts_with("X"), names_to = "Year", values_to = "Price_per_liter") |>
+  mutate(Price_per_liter = as.numeric(Price_per_liter)) |> 
   filter(!is.na(Price_per_liter))  
 
-gas_prices_long <- gas_prices_long %>%
+gas_prices_long <- gas_prices_long |>
   mutate(Price_per_gallon = Price_per_liter * 3.78541)
 
-merged_data <- gas_prices_long %>%
-  left_join(country_data, by = c("country" = "name")) %>%
-  select(Price_per_gallon, Alpha_3, Region, Year)
+merged_data <- gas_prices_long |>
+  left_join(country_data, by = c("country" = "name")) |>
+  select(Price_per_gallon, alpha.3, region, Year)
 
-unmatched_countries <- gas_prices_long %>%
+unmatched_countries <- gas_prices_long |>
   filter(!country %in% country_data$name)
 
 num_unmatched <- nrow(unmatched_countries)
@@ -533,11 +510,60 @@ num_unmatched <- nrow(unmatched_countries)
 # Print unmatched countries
 if (num_unmatched > 0) {
   print(paste("Number of unmatched countries:", num_unmatched))
-  print(unmatched_countries)
 } else {
   print("All countries matched.")
 }
 
+```
 
-# I know this is very wrong but I was really struggling so I asked chatgpt for help and that obviously didn't work either so I'm just going to ask for help after class. Sorry for being so behind in this class, I have a ton of homework for my other classes and this class somehow got pushed to the bottom of my priorities.
+```{r}
+library(reticulate)
+library(dplyr)
+alt <- import("altair")
+pd <- import("pandas")
+```
+
+```{r}
+# Filter out "null" region in R
+merged_data_filtered <- merged_data |>
+  filter(region != "null") |>
+  group_by(Year, region) |>
+  summarize(Price_per_gallon = mean(Price_per_gallon, na.rm = TRUE), .groups = 'drop') |>
+  mutate(Year = as.numeric(gsub("X", "", Year)))
+
+# Convert the filtered R dataframe to a Pandas dataframe
+merged_data_py <- r_to_py(merged_data_filtered)
+
+(alt$Chart(merged_data_py)$mark_line()$
+  encode(
+    x = "Year",
+    y = "Price_per_gallon",
+    color = "region"
+  )$
+  properties(
+    width = 450, 
+    height = 400,
+    title = "Average Gas Price per Gallon by Year and Region")
+)
+```
+
+```{r}
+merged_data_averaged <- merged_data |>
+  filter(region != "null") |>
+  group_by(Year) |>
+  summarize(Price_per_gallon = mean(Price_per_gallon, na.rm = TRUE), .groups = 'drop') |>
+  mutate(Year = as.numeric(gsub("X", "", Year)))
+
+merged_data_averaged_py <- r_to_py(merged_data_averaged)
+
+(alt$Chart(merged_data_averaged_py)$mark_line()$
+  encode(
+    x = "Year",
+    y = "Price_per_gallon"
+  )$
+  properties(
+    width = 450, 
+    height = 400,
+    title = "Average Gas Price per Gallon by Year")
+)
 ```
