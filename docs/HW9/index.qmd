@@ -1,0 +1,177 @@
+---
+title: "HW9"
+subtitle: "due 3/2"
+author: "Alayna Smith - ams293"
+format: 
+  html:
+    code-fold: true
+embed-resources: true
+code-tools: true
+---
+
+[**Exercise 1:**]{.underline}
+
+a\)
+
+1.  There are many ways to use color in graphics, such as distinguishing discrete items or groups that do not have an intrinsic order, representing data values sequentially, or highlighting.
+2.  When representing data values, there are 2 types of color scales: sequential and diverging. Sequential represents a range of values that progress from low to high in a single direction. Diverging is used when data has a meaningful midpoint and values diverge in opposite directions.
+
+b\)
+
+1.  Amounts
+
+2.  Distributions
+
+3.  Proportions
+
+4.  x-y relationships
+
+5.  Geospatial data
+
+6.  Uncertainty
+
+    Something interesting that I learned was that for large numbers of points, regular scatterplots can become uninformative due to overplotting. In this case, contour lines, 2D bins, or hex bins may provide an alternative.
+
+c\)
+
+d\)
+
+```{r}
+library(vegabrite)
+vl_chart() |>
+  vl_mark_line() |>
+  vl_add_properties(width = 450, height = 400) |>
+  vl_encode_x("Year:O") |>
+  vl_encode_y("Score:Q") |>
+  vl_scale_y(domain = c(65, 95)) |>
+  vl_encode_color("Department:N") |>
+  vl_mark_line() |>
+  vl_add_data(values = list(
+    list(Department = "HR", Year = 2023, Score = 78),
+    list(Department = "HR", Year = 2024, Score = 82),
+    list(Department = "Engineering", Year = 2023, Score = 85),
+    list(Department = "Engineering", Year = 2024, Score = 90),
+    list(Department = "Marketing", Year = 2023, Score = 72),
+    list(Department = "Marketing", Year = 2024, Score = 68),
+    list(Department = "Sales", Year = 2023, Score = 80),
+    list(Department = "Sales", Year = 2024, Score = 76),
+    list(Department = "Finance", Year = 2023, Score = 88),
+    list(Department = "Finance", Year = 2024, Score = 87)
+  ))
+```
+
+e\)
+
+[**Exercise 2:**]{.underline}
+
+a\)
+
+```{r}
+pie_layer <- vl_chart() |>
+  vl_mark_arc(outerRadius = 100) |>
+  vl_encode_theta("count:Q", stack = TRUE) |>
+  vl_encode_color("response:N") |>
+  vl_scale_color(scheme = "bluegreen")
+
+text_layer <- vl_chart() |>
+  vl_mark_text(radius = 110) |>
+  vl_encode_theta("count:Q", stack = TRUE) |>
+  vl_encode_text("count:Q") |>
+  vl_encode_color("response:N")
+
+vl_layer(pie_layer, text_layer) |>
+  vl_facet_column(field = 'year:N') |>
+  vl_add_data(url = "https://calvin-data304.netlify.app/data/likert-survey.csv")
+```
+
+b\)
+
+```{r}
+last_year <- vl_chart() |>
+  vl_mark_line() |>
+  vl_filter("datum.year == 'last year'") |>
+  vl_encode_x("number:Q") |>
+  vl_encode_y("count:Q") |>
+  vl_encode_color("year:N", legend = list(title = "Year", orient = "right"))
+
+this_year <- vl_chart() |>
+  vl_mark_line() |>
+  vl_filter("datum.year == 'this year'") |>
+  vl_encode_x("number:Q") |>
+  vl_encode_y("count:Q") |>
+  vl_encode_color("year:N", legend = list(title = "Year", orient = "right"))
+
+vl_layer(last_year, this_year) |>
+  vl_add_properties(width = 350, height = 300) |>
+  vl_add_data(url = "https://calvin-data304.netlify.app/data/likert-survey.csv")
+```
+
+Exercise 3:
+
+```{r}
+library(altair)
+vega_data <-
+  import_vega_data()
+
+us_map_url <- vega_data$us_10m$url
+state_map <-
+  vl_chart() |>
+  vl_add_data(
+    url = us_map_url, 
+    format = list(type = "topojson", feature = "states")) |>
+  vl_add_properties(projection = list(type = "albersUsa")) |>
+  vl_mark_geoshape(fill = "transparent", stroke = "steelblue") 
+state_map |> vl_add_properties(width = 500, height = 300)
+```
+
+```{r}
+us_map_url <- vega_data$us_10m$url
+county_map <-
+  vl_chart(width = 500, height = 300) |>
+  vl_add_data(
+    url = us_map_url, 
+    format = list(type = "topojson", feature = "counties")) |>
+  vl_add_properties(projection = list(type = "albersUsa")) |>
+  vl_mark_geoshape(fill = "transparent", stroke = "lightgray") 
+
+county_map
+
+county_map |>
+  vl_lookup(
+    lookup = "id", 
+    from = 
+      list(
+        data = list(url = vega_data$unemployment$url), 
+        key = "id", 
+        fields = list("rate"))) |> 
+  vl_encode_stroke(value = "transparent") |>
+  vl_encode_fill("rate:Q") |>
+  vl_legend_fill(title = "unemployment rate", format = ".0%", type = "gradient") |>
+  vl_add_properties(width = 350, height = 200)
+```
+
+```{r}
+us_map_url <- vega_data$us_10m$url
+
+# Create a base map with counties using the same method
+county_map <- vl_chart(width = 500, height = 300) |>
+  vl_add_data(
+    url = us_map_url, 
+    format = list(type = "topojson", feature = "counties")) |>
+  vl_add_properties(projection = list(type = "albersUsa")) |>
+  vl_mark_geoshape(fill = "transparent", stroke = "lightgray")
+
+county_map
+
+county_map |>
+  vl_lookup(
+    lookup = "id", 
+    from = list(
+      data = list(url = vega_data$earthquakes$url), 
+      key = "region", 
+      fields = list("mag"))) |>  
+  vl_encode_stroke(value = "transparent") |>
+  vl_encode_fill("mag:Q") |>
+  vl_legend_fill(title = "Earthquake Magnitude", format = ".1f", type = "gradient") |>
+  vl_add_properties(width = 350, height = 200)
+```
