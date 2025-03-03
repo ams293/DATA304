@@ -1,0 +1,11 @@
+---
+title: "Final Portfolio"
+subtitle: "due 3/13"
+author: "Alayna Smith - ams293"
+format: 
+  html:
+    code-fold: true
+embed-resources: true
+code-tools: true
+---
+
