@@ -1,0 +1,67 @@
+---
+title: "HW4"
+subtitle: "due 2/2"
+author: "Alayna Smith - ams293"
+format: 
+  html:
+    code-fold: true
+embed-resources: true
+code-tools: true
+---
+
+Exercise 6:
+
+```{r}
+#| message: false
+#| warning: false
+library(vegawidget)
+'
+{
+  "title": "DNA Kits Similarities/Differences",
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/twins-genetics-long.csv",
+    "format": {"type": "csv"}
+  },
+  "height": 400,
+  "width": 450,
+  "mark": "boxplot",
+  "encoding": {
+    "x": {"field": "kit", "type": "nominal", "title": "DNA Kit"},
+    "y": {
+      "field": "genetic share",
+      "type": "quantitative",
+      "title": "Genetic Share"
+    },
+    "color": {"field": "kit", "type": "nominal", "title": "DNA Kit"}
+  }
+}
+' |> as_vegaspec()
+```
+
+```{r}
+#| message: false
+#| warning: false
+'
+{
+  "data": {
+    "url": "https://calvin-data304.netlify.app/data/twins-genetics-long.csv",
+    "format": {"type": "csv"}
+  },
+  "mark": "bar",
+  "encoding": {
+    "x": {"field": "region", "type": "nominal", "title": "Region"},
+    "y": {
+      "field": "genetic share",
+      "type": "quantitative",
+      "title": "Genetic Share"
+    },
+    "color": {"field": "twin", "type": "nominal", "title": "Twin"},
+    "column": {
+      "field": "pair",
+      "type": "nominal",
+      "title": "Twin Pairs Similarities/Differences"
+    }
+  }
+}
+' |> as_vegaspec()
+```
