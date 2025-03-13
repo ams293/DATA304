@@ -9,3 +9,254 @@ embed-resources: true
 code-tools: true
 ---
 
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+# echo=TRUE, message=FALSE, warning=FALSE
+library(tidyverse)
+library(lubridate)
+library(reticulate)
+library(altair)
+library(vegabrite)
+alt <- import("altair")
+pd <- import("pandas")
+```
+
+[**Exercise 1:**]{.underline}
+
+a\) I really liked the way that Priscilla compared the twins with her point graph. I did something very similar here in part c, except I used the pair ID instead of the kit type. I like how you can easily see the slight differences in the kit results in Priscilla's graph, which makes the differences between the twins clear. I admire the way she used the shapes - prior to seeing this I did not know how to do that!
+
+b\) When Daniel compared the twins, he made a very pretty graphic, but I couldn't help but think he should've averaged the genetic shares like I'm doing here in part c, so that there's not multiple points for each person's region. Having all those points would be good if we were comparing the kits, but if we only want to focus on the similarities and differences between the twins, I believe it makes sense to average the genetic shares so we can narrow our view.
+
+c\) and d)
+
+```{r}
+vl_chart(title = "Similarities/Differences between kits") |>
+  vl_config_title(fontSize = 20) |>
+  vl_mark_rect() |>
+  vl_encode_x("region:N") |>
+  vl_encode_y("kit:N") |>
+  vl_encode_facet("pair:N", columns = 3) |>
+  vl_encode_color("genetic share:Q") |>
+  vl_add_properties(width = 170, height = 170) |>
+  vl_add_data(url = "https://calvin-data304.netlify.app/data/twins-genetics-long.csv")
+```
+
+In this graphic, I decided to make a heatmap. I chose this type of graphic because I believe it's much easier to see slight differences between the colors for each kits' result. For example, in the pair 1 chart, you can see the slight differences in the shades of blue for the regions. This helps highlight the different results the kits gave.
+
+```{r}
+vl_chart(title = "Similarities/Differences between twins") |>
+  vl_mark_point() |>
+  vl_config_title(fontSize = 20) |>
+  vl_encode_x("region:N") |>
+  vl_encode_y(
+    "genetic share:Q", 
+    aggregate = "mean"
+    ) |>
+  vl_encode_column("pair:N") |>
+  vl_encode_color("id:N", scale = list(scheme = "set1")) |>
+  vl_add_properties(width = 90, height = 300) |>
+  vl_add_data(url = "https://calvin-data304.netlify.app/data/twins-genetics-long.csv")
+```
+
+In this graphic, I decided to make a point graph. I wanted to highlight the differences between the twins, not the kits, so I decided to average the genetic shares, so I wouldn't have multiple points for each region. This way I could have an estimate of the genetic shares for each person to be able to compare to their twin. I also faceted by pair to make the graph a little easier to read.
+
+[**Exercise 2:**]{.underline}
+
+The problem with the original graphic is that it is trying to emphasize the changes in total touchpoints, but only gives data for "touchpoints per customer." To be able to compare the exact counts of total touchpoints, we would need to have data for the number of customers each month. I almost think that the maker of the original graphic was more interested in the changes in the number of customers, not touchpoints, but I don't know.
+
+### **Total Customer Touchpoints**
+
+##### The black line is the total of the three types of touchpoints. Hover to see details.
+
+```{r}
+wide_data <- read.csv("https://calvin-data304.netlify.app/data/swd-lets-practice-ex-5-03.csv")
+
+long_data <- 
+  pivot_longer(wide_data, cols = c("Phone.Touchpoints", "Chat.Touchpoints", "Email.Touchpoints"), names_to = "type", values_to = "count") |>
+  mutate(Date = ym(Date))
+
+total_data <- long_data |>
+  group_by(Date) |>
+  summarize(type = "Total.Touchpoints", count = sum(count))
+
+tooltip_data <- wide_data |>
+  mutate(Date = ym(Date)) |>
+  rename(
+    phone = Phone.Touchpoints,
+    chat = Chat.Touchpoints,
+    email = Email.Touchpoints
+  ) |>
+  mutate(total = phone + chat + email)
+
+total_data <- total_data |>
+  left_join(tooltip_data, by = "Date")
+
+touchpoints_layer <- vl_chart(data = long_data) |>
+  vl_mark_line() |>
+  vl_encode_x("Date:T") |>
+  vl_encode_y("count:Q") |>
+  vl_encode_strokeDash("type:N") |>
+  vl_encode_color("type:N") 
+
+total_layer <- vl_chart(data = total_data) |>
+  vl_mark_line(color = 'black') |>
+  vl_encode_x("Date:T") |>
+  vl_encode_y("count:Q") |>
+  vl_encode_size(value = 4) |>
+  vl_encode_tooltip_array(c("Date", "phone", "chat", "email", "total"))
+
+vl_layer(touchpoints_layer, total_layer) |>
+  vl_add_properties(
+    width = 400, 
+    height = 350
+    )
+```
+
+[**Exercise 3:**]{.underline}
+
+### **Tanzania DHS**
+
+##### red = fertility rate, green = use of contraception (%), blue = unmet need for family planning (%)
+
+##### hover to see more details
+
+```{r}
+tanzania <- pd$read_csv("~/DATA304/docs/final_portfolio/TanzaniaDHS.csv")
+
+base <- alt$Chart(tanzania)$encode(
+  x=alt$X("Year:Q", scale=alt$Scale(domain=c(1990, 2016)))
+)
+
+fertility <- base$mark_line(color="red")$encode(
+  y=alt$Y("Fertility Rate:Q", 
+          title="Fertility Rate", 
+          scale=alt$Scale(domain=c(5, 6.5))),
+  tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+fertility_points <- base$mark_point(color="red", filled=TRUE, size=60)$encode(
+  y=alt$Y("Fertility Rate:Q",
+          title=" ", 
+          scale=alt$Scale(domain=c(5, 6.5))),
+          tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+contraception <- base$mark_line(color="green")$encode(
+  y=alt$Y("Use of Contraception (%):Q", 
+          title=" ", 
+          scale=alt$Scale(domain=c(0, 40))),
+  tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+contraception_points <- base$mark_point(color="green", filled=TRUE, size=60)$encode(
+  y=alt$Y("Use of Contraception (%):Q",
+          title=" ", 
+          scale=alt$Scale(domain=c(0, 40))),
+          tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+planning <- base$mark_line(color="blue")$encode(
+  y=alt$Y("Unmet Need for Family Planning (%):Q", 
+          title="Use of Contraception (%) and Unmet Need for Family Planning (%)", 
+          scale=alt$Scale(domain=c(0, 40))),
+  tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+planning_points <- base$mark_point(color="blue", filled=TRUE, size=60)$encode(
+  y=alt$Y("Unmet Need for Family Planning (%):Q",
+          title=" ", 
+          scale=alt$Scale(domain=c(0, 40))),
+          tooltip=list("Year", "Fertility Rate", "Use of Contraception (%)", "Unmet Need for Family Planning (%)")
+)
+
+alt$layer(fertility, fertility_points, contraception, contraception_points, planning, planning_points)$resolve_scale(
+  y="independent"
+)$properties(
+  #title="Tanzania DHS",
+  #subtitle= "red = fertility rate, green = use of contraception (%), blue = unmet need for family planning (%)",
+  width=400,
+  height=350
+)
+```
+
+In this graphic, you can see how the fertility rate and unmet demand for family planning have decreased over the years, while the use of contraception has increased.
+
+[**Exercise 4:**]{.underline}
+
+I got this dataset from this link: <https://osf.io/5k7fp/files/osfstorage>
+
+```{r}
+abortions <- read.csv("~/DATA304/docs/final_portfolio/Global Abortion Incidence Dataset.csv")
+filteredabortions <- abortions |> 
+  select(country, yearstart, region, subregion, numberofabortions) |> 
+  filter(!is.na(numberofabortions))
+
+total_data <- filteredabortions |>
+  group_by(yearstart) |>
+  summarize(
+    totalabortions = sum(numberofabortions)) |>
+  left_join(filteredabortions, by = "yearstart")
+
+region_chart <- vl_chart(title = "Abortion by Region") |>
+  vl_add_point_selection("region", fields = list("region")) |>
+  vl_bind_select_input("region", 
+    options = list(NA, "Central and Southern Asia", 
+                   "Europe and Northern America", 
+                   "Western Asia and Northern Africa", 
+                   "Australia and New Zealand", "Latin America", 
+                   "East and Southeastern Asia", "Sub-Saharan Africa", 
+                   "Oceania (excluding Australia and New Zealand)")) |>
+  vl_mark_point() |>
+  vl_encode_x("yearstart:Q", scale = list(domain = c(1987, 2020))) |>
+  vl_encode_y("numberofabortions:Q") |>
+  vl_encode_color(value = "rgba(128, 128, 128, 0)") |>
+  vl_encode_tooltip_array(c("yearstart", "numberofabortions", "country")) |>
+  vl_condition_color(
+    param = "region", 
+    field = "region", 
+    type = "nominal") |>
+  vl_config_title(fontSize = 20) |>
+  vl_add_interval_selection(
+    name = "panzoom", 
+    bind = "scales",  encodings = c("x", "y")
+    )
+
+total_line_chart <- vl_chart(title = "Total Abortion") |>
+  vl_mark_line() |>
+  vl_encode_x("yearstart:Q", scale = list(domain = c(1987, 2020))) |>
+  vl_encode_y("totalabortions:Q")
+
+total_points_chart <- vl_chart() |>
+  vl_mark_point(filled = TRUE) |>
+  vl_encode_x("yearstart:Q", scale = list(domain = c(1987, 2020))) |>
+  vl_encode_tooltip_array(c("yearstart", "totalabortions")) |>
+  vl_encode_y("totalabortions:Q")
+
+total_chart <- vl_layer(total_line_chart, total_points_chart)
+
+vl_hconcat(total_chart, region_chart) |>
+  vl_add_data(total_data) 
+```
+
+In the first chart, I totaled all the regions' number of abortions and graphed the total abortions. In the second chart, I chose to emphasize the number of abortions in each region. You can easily see how the number of abortions for each region is different from others. I also used tooltips and interactivity in the second chart.
+
+[**Exercise 5:**]{.underline}
+
+a\) I used encode_facet, encode_color, and encode_column in Exercise 1. I used encode_strokeDash, encode_size, and encode_tooltip_array in Exercise 2.
+
+b\) I layered "touchpoints_layer" and "total_layer" in Exercise 2. I layered "fertility", "fertility_points", "contraception", "contraception_points", "planning", and "planning_points" in Exercise 3. I layered "total_line_chart" and "total_points_chart" in Exercise 4.
+
+c\) I used encode_facet in Exercise 1.
+
+d\) I used vl_hconcat in Exercise 4.
+
+e\) I used filled = TRUE in Exercise 3 and 4.
+
+f\) I used tooltip in Exercise 2, 3, and 4.
+
+g\) I used interaction in Exercise 4.
+
+[**Exercise 6:**]{.underline}
+
+a\) In exercise 3, I chose to make dual y-axis. I wanted to see the trends in all the variables, but one of them (fertility rate) had a different range than the other two variables, so to make sure I could easily see all the trends, I put the range for fertility rate on the left side and the range for the other variables on the right side.
+
+b\)
